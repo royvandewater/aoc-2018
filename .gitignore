@@ -1,3 +1,5 @@
 *.pyc\n*.swp\n*.pyo\n
 *input
 *.swp
+
+input.txt
