@@ -2,8 +2,10 @@
 
 :- initialization(main, main).
 
-main :-
-  open('example1.txt', read, In),
+
+main(Argv) :-
+  [Filename | _] = Argv,
+  open(Filename, read, In),
   input_to_adjustments(In, Adjustments),
   find_first_repeated_frequency(Adjustments, FirstRepeatedFrequency),
   write("First repeated frequency: "), writeln(FirstRepeatedFrequency),
@@ -17,9 +19,11 @@ input_to_adjustments(In, Adjustments, Acc) :-
    (Line = end_of_file
     % THEN our Accumulator contains our entire list of Adjustments
     -> Adjustments = Acc
-    % ELSE convert the line into a number, append it ot the list of adjustments, and recurse
+    % ELSE % convert the line into a number
     ;  (atom_number(Line, Value),
+        % append it to the list of adjustments
         append(Acc, [Value], NewAcc),
+        % and recurse
         input_to_adjustments(In, Adjustments, NewAcc)))).
 
 find_first_repeated_frequency(Adjustments, FirstRepeatedFrequency) :- find_first_repeated_frequency(Adjustments, FirstRepeatedFrequency, [0]).
@@ -27,9 +31,7 @@ find_first_repeated_frequency(Adjustments, FirstRepeatedFrequency, Frequencies) 
   % The head of Frequencies is always the most recently visited frequency
   ([LastFrequency | _] = Frequencies,
    % Grab the first adjustment
-   [Adjustment | Rest] = Adjustments,
-   % and push it to the end of the adjustment list like a ring buffer so that we can keep processing them indefinitely
-   append(Rest, [Adjustment], NewAdjustments),
+   [Adjustment | OtherAdjustments] = Adjustments,
    % calculate the new frequency by applying the adjustment to the last frequency
    Frequency is LastFrequency + Adjustment,
 
@@ -37,7 +39,12 @@ find_first_repeated_frequency(Adjustments, FirstRepeatedFrequency, Frequencies) 
    (memberchk(Frequency, Frequencies)
     % THEN this is the first repeated frequency
     -> FirstRepeatedFrequency = Frequency
-    % ELSE we add this frequency to the head of the list of known frequencies and recurse
+    % ELSE
+    % add this frequency to the head of the list of known frequencies
     ;  (NewFrequencies = [Frequency | Frequencies],
+        % push our current Adjustement to the end of the list of Other Adjustments, treating it like
+        % a ring buffer so that we can keep processing them indefinitely
+        append(OtherAdjustments, [Adjustment], NewAdjustments),
+        % and recurse
         find_first_repeated_frequency(NewAdjustments, FirstRepeatedFrequency, NewFrequencies)))).
 
