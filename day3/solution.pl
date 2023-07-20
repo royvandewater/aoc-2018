@@ -12,6 +12,8 @@ main(Argv) :-
   list_claims(List, Claims),
   number_of_overlapping_pixels(Claims, Count),
   log("Count", Count),
+  no_overlap(ClaimId, Claims),
+  log("No Overlap ClaimId", ClaimId),
   close(In).
 
 log(Label, Value) :- write(Label), write(": "), writeln(Value).
@@ -75,14 +77,6 @@ number_of_overlapping_pixels(Claims, Count) :-
     Count
   ).
 
-number_overlapping_on_two_boxes(Box1, Box2, Count) :-
-  aggregate_all(
-    count,
-    Pixel,
-    pixel_in_boxes(Pixel, Box1, Box2),
-    Count
-  ).
-
 % [Xa, Ya] is the top left coordinate
 % [Xb, Yb] is the bottom right coordinate
 bounding_box([Position, Dimensions], [[Xa, Ya], [Xb, Yb]]) :-
@@ -112,18 +106,59 @@ pixel_in_boxes(Pixel, Box1, Box2) :-
   pixel_in_box(Pixel, Box1),
   pixel_in_box(Pixel, Box2).
 
-:- begin_tests(pixel_in_box).
+no_overlap(_, []) :- false.
+no_overlap(ClaimId, [Claim]) :- [ ClaimId | _ ] = Claim, !.
+no_overlap(ClaimId, Claims) :-
+  member(C1, Claims),
+  select(C1, Claims, Rest),
+  claim_has_no_overlap(C1, Rest),
+  [ ClaimId | _ ] = C1, !.
 
-test(pixel_in_box_when_empty, [fail]) :-
-  pixel_in_box(_Pixel, [[0, 0], [0, 0]]).
+claim_has_no_overlap(_Claim, []) :- true, !.
+claim_has_no_overlap(Claim, Claims) :-
+  C1 = Claim,
+  [ C2 | Rest ] = Claims,
 
-test(pixel_in_box_when_one_pixel, all(X == [[0, 0]])) :-
-  pixel_in_box(X, [[0, 0], [1, 1]]).
+  (has_overlap(C1, C2)
+   -> false
+   ;  claim_has_no_overlap(C1, Rest)).
 
-test(pixel_in_box_when_one_pixel, all(X == [[0, 0], [0, 1], [1, 0], [1, 1]])) :-
-  pixel_in_box(X, [[0, 0], [2, 2]]).
+has_overlap(Claim1, Claim2) :-
+  [ _ | B1 ] = Claim1,
+  [ _ | B2 ] = Claim2,
+  pixel_in_boxes(_, B1, B2), !.
 
-:- end_tests(pixel_in_box).
+
+
+  % length(Claims, L), L > 0,
+  % ClaimId = 1.
+
+:- begin_tests(no_overlap).
+
+test(no_overlap_when_empty, fail) :-
+  no_overlap(_, []).
+
+test(no_overlap_when_one_claim, true(X == 1)) :-
+  no_overlap(X, [[1, [1, 1], [1, 1]]]).
+
+test(no_overlap_when_two_claims_overlap, fail) :-
+  no_overlap(_, [[1, [1, 1], [1, 1]], [2, [1, 1], [1, 1]]]).
+
+test(no_overlap_when_three_claims, true(X == 1)) :-
+  no_overlap(X, [
+    [1, [1, 1], [1, 1]],
+    [2, [2, 2], [1, 1]], % 2 & 3 overlap
+    [3, [2, 2], [1, 1]]
+  ]).
+
+test(no_overlap_when_three_claims_target_in_back, true(X == 3)) :-
+  no_overlap(X, [
+    [1, [1, 1], [1, 1]], % 1 & 2 overlap
+    [2, [1, 1], [1, 1]],
+    [3, [2, 2], [1, 1]]
+  ]).
+
+:- end_tests(no_overlap).
 
 :- begin_tests(number_of_overlapping_pixels).
 
@@ -169,6 +204,19 @@ test(number_of_overlapping_pixels_when_pixel_overlapped_thrice, true(X == 1)) :-
   ], X).
 
 :- end_tests(number_of_overlapping_pixels).
+
+:- begin_tests(pixel_in_box).
+
+test(pixel_in_box_when_empty, [fail]) :-
+  pixel_in_box(_Pixel, [[0, 0], [0, 0]]).
+
+test(pixel_in_box_when_one_pixel, all(X == [[0, 0]])) :-
+  pixel_in_box(X, [[0, 0], [1, 1]]).
+
+test(pixel_in_box_when_one_pixel, all(X == [[0, 0], [0, 1], [1, 0], [1, 1]])) :-
+  pixel_in_box(X, [[0, 0], [2, 2]]).
+
+:- end_tests(pixel_in_box).
 
 :- begin_tests(list_claims).
 
