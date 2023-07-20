@@ -1,11 +1,10 @@
 #!/usr/bin/env swipl
 
-% :- initialization(main, main).
-
+:- initialization(main, main).
 
 % A = 1, B = 2, X = 3, format('A: ~d, B: ~d, X: ~d', [A, B, X]), nl.
 
-main() :- main("input.txt").
+% main() :- main("input.txt").
 main(Argv) :-
   [Filename | _] = Argv,
   open(Filename, read, In),
@@ -25,15 +24,19 @@ input_to_list(In, List, Acc) :-
     ; (append(Acc, [Line], NewAcc),
     input_to_list(In, List, NewAcc)))).
 
-list_claims([], Claims) :- Claims = [], !.
-list_claims(List, Claims) :-
-  [ Head | _ ] = List,
+list_claims(List, Claims) :- list_claims(List, Claims, []).
+list_claims([], Claims, Acc) :- Claims = Acc.
+list_claims(List, Claims, Acc) :-
+  [ Head | Rest ] = List,
   split_string(Head, " ", "", Parts),
   [ IdStr, _, CoordsStr, DimensionsStr ] = Parts,
   str_id(IdStr, Id),
   str_coords(CoordsStr, Coords),
   str_dimensions(DimensionsStr, Dimensions),
-  Claims = [Id, Coords, Dimensions].
+  Claim = [Id, Coords, Dimensions],
+  append(Acc, [Claim], NewAcc),
+  list_claims(Rest, Claims, NewAcc).
+
 
 str_id(Str, Id) :-
   trim(Str, "#", IdStr),
@@ -59,27 +62,26 @@ trim(Str, Chars, Trimmed) :- split_string(Str, "\0", Chars, [ Trimmed | _ ]).
 
 number_of_overlapping_pixels([], 0) :- true, !.
 number_of_overlapping_pixels(Claims, Count) :-
-  aggregate_all(sum(X),
-    (
-      member([Id1 | B1], Claims),
-      member([Id2 | B2], Claims),
-      Id1 < Id2,
-      Id1 \= Id2,
-      number_overlapping_on_two_boxes(B1, B2, X)
-    ),
-    Count).
-
-number_overlapping_on_two_boxes(Box1, Box2, Count) :-
-  bounding_box(Box1, [[Xa1, Ya1], [Xb1, Yb1]]),
-  bounding_box(Box2, [[Xa2, Ya2], [Xb2, Yb2]]),
-
   aggregate_all(
     count,
-    (pixel_in_box(Box1, Pixel), pixel_in_box(Box2, Pixel)),
+    Pixel,
+    (
+      member([Id1 | Box1], Claims),
+      member([Id2 | Box2], Claims),
+      Id1 < Id2,
+      Id1 \= Id2,
+      pixel_in_boxes(Pixel, Box1, Box2)
+    ),
     Count
   ).
 
-
+number_overlapping_on_two_boxes(Box1, Box2, Count) :-
+  aggregate_all(
+    count,
+    Pixel,
+    pixel_in_boxes(Pixel, Box1, Box2),
+    Count
+  ).
 
 % [Xa, Ya] is the top left coordinate
 % [Xb, Yb] is the bottom right coordinate
@@ -94,8 +96,9 @@ between_non_inclusive_high(Low, High, Value) :-
   Value \= High.
 
 % Enumerates the pixels that fall within the box
-pixel_in_box([_, [0, 0]], _) :- false.
-pixel_in_box(Box, [X, Y]) :-
+pixel_in_box(_, [_, [0, 0]]) :- false.
+pixel_in_box(Pixel, Box) :-
+  [X, Y] = Pixel,
   bounding_box(Box, [[Xa, Ya], [Xb, Yb]]),
   Xmin is min(Xa, Xb),
   Xmax is max(Xa, Xb),
@@ -104,16 +107,21 @@ pixel_in_box(Box, [X, Y]) :-
   between_non_inclusive_high(Xmin, Xmax, X),
   between_non_inclusive_high(Ymin, Ymax, Y).
 
+% Enumerate pixels that fall in both boxes
+pixel_in_boxes(Pixel, Box1, Box2) :-
+  pixel_in_box(Pixel, Box1),
+  pixel_in_box(Pixel, Box2).
+
 :- begin_tests(pixel_in_box).
 
 test(pixel_in_box_when_empty, [fail]) :-
-  pixel_in_box([[0, 0], [0, 0]], _Pixel).
+  pixel_in_box(_Pixel, [[0, 0], [0, 0]]).
 
 test(pixel_in_box_when_one_pixel, all(X == [[0, 0]])) :-
-  pixel_in_box([[0, 0], [1, 1]], X).
+  pixel_in_box(X, [[0, 0], [1, 1]]).
 
 test(pixel_in_box_when_one_pixel, all(X == [[0, 0], [0, 1], [1, 0], [1, 1]])) :-
-  pixel_in_box([[0, 0], [2, 2]], X).
+  pixel_in_box(X, [[0, 0], [2, 2]]).
 
 :- end_tests(pixel_in_box).
 
@@ -167,10 +175,13 @@ test(number_of_overlapping_pixels_when_pixel_overlapped_thrice, true(X == 1)) :-
 test(list_claims_when_empty) :-
   list_claims([], []).
 
-test(list_claims_when_one_claim) :-
-  list_claims(["#1 @ 1,3: 4x4"], [1, [1,3], [4, 4]]).
+test(list_claims_when_one_claim, true(X == [[1, [1,3], [4, 4]]])) :-
+  list_claims(["#1 @ 1,3: 4x4"], X).
 
-test(list_claims_when_one_different_claim) :-
-  list_claims(["#2 @ 3,1: 5x6"], [2, [3,1], [5, 6]]).
+test(list_claims_when_one_different_claim, true(X==[[2, [3,1], [5, 6]]])) :-
+  list_claims(["#2 @ 3,1: 5x6"], X).
+
+test(list_claims_when_two_claims, true(X==[[1, [1,3], [4, 4]], [2, [3,1], [5, 6]]])) :-
+  list_claims(["#1 @ 1,3: 4x4", "#2 @ 3,1: 5x6"], X).
 
 :- end_tests(list_claims).
