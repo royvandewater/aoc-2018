@@ -1,10 +1,12 @@
 :- module(part_1, [part_1/2]).
 
+:- use_module(count_naps_containing_minute).
+
 part_1([], _) :- !, false.
 part_1(Guards, Answer) :-
   most_sleepy_guard(Guards, SleepyGuard),
 
-  minute_in_naps(SleepyGuard.naps, Minute), !,
+  naps_minute_most_asleep(SleepyGuard.naps, Minute),
   Answer is SleepyGuard.id * Minute.
 
 most_sleepy_guard([], _) :- !, fail.
@@ -23,7 +25,6 @@ most_sleepy_guard(Guards, SleepyGuard, Candidate) :-
    -> most_sleepy_guard(Rest, SleepyGuard, Guard)
    ;  most_sleepy_guard(Rest, SleepyGuard, Candidate)).
 
-
 minutes_asleep(Naps, Minutes) :- minutes_asleep(Naps, Minutes, 0).
 minutes_asleep([], Minutes, Acc) :- !, Minutes = Acc.
 minutes_asleep(Naps, Minutes, Acc) :-
@@ -33,16 +34,29 @@ minutes_asleep(Naps, Minutes, Acc) :-
   NewAcc is Acc + NapMinutes,
   minutes_asleep(Rest, Minutes, NewAcc).
 
-minute_in_naps([], _) :- !, true.
-minute_in_naps(Naps, Minute) :-
-  [ Nap | Rest ] = Naps,
-  [ Begin, End ] = Nap,
-  between_non_inclusive_high(Begin, End, Minute),
-  minute_in_naps(Rest, Minute).
+naps_minute_most_asleep(Naps, MinuteMostAsleep) :-
+  findall(
+    [Minute, Count],
+    (between(0, 59, Minute), count_naps_containing_minute(Naps, Minute, Count), Count > 0),
+    MinuteNapCounts
+  ),
 
-between_non_inclusive_high(Low, High, Value) :-
-  between(Low, High, Value),
-  Value \= High.
+  minute_with_max_count(MinuteNapCounts, MinuteMostAsleep).
+
+minute_with_max_count(MinuteNapCounts, MinuteWithMaxCount) :-
+  [ Head | Rest ] = MinuteNapCounts,
+  minute_with_max_count(Rest, MinuteWithMaxCount, Head).
+
+minute_with_max_count([], MinuteWithMaxCount, Acc) :- !, [ MinuteWithMaxCount, _ ] = Acc.
+minute_with_max_count(MinuteNapCounts, MinuteWithMaxCount, Acc) :-
+  [ Head | Rest ] = MinuteNapCounts,
+  [ _, HeadCount ] = Head,
+  [ _, AccCount ] = Acc,
+  (HeadCount > AccCount
+   -> minute_with_max_count(Rest, MinuteWithMaxCount, Head)
+   ;  minute_with_max_count(Rest, MinuteWithMaxCount, Acc)).
+
+
 
 :- begin_tests(part_1).
 
@@ -61,7 +75,7 @@ test(part_1_when_different_id, true(Actual==Expected)) :-
   Expected = 45,
   part_1([guard{id: 3, naps:[[15,16]]}], Actual).
 
-test(part_1_when_guard_has_overlapping_namps, true(Actual==Expected)) :-
+test(part_1_when_guard_has_overlapping_naps, true(Actual==Expected)) :-
   Expected = 19,
   part_1([guard{id: 1, naps:[[10,20], [19, 25]]}], Actual).
 
@@ -71,5 +85,9 @@ test(part_1_when_two_guards, true(Actual==Expected)) :-
     guard{id: 1, naps:[[10,20]]},
     guard{id: 2, naps:[[10,20], [19, 25]]}
   ], Actual).
+
+test(part_1_when_guard_has_three_naps_and_one_no_overlap, true(Actual==Expected)) :-
+  Expected = 19,
+  part_1([guard{id: 1, naps:[[10,20], [19, 25], [40, 45]]}], Actual).
 
 :- end_tests(part_1).

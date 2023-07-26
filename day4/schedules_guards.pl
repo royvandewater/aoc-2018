@@ -1,23 +1,29 @@
 :- module(schedules_guards, [schedules_guards/2]).
 
+:- use_module(library(dicts)).
+:- use_module(library(pairs)).
+
 schedules_guards([], []) :- !, true.
 schedules_guards(Schedules, Guards) :-
   group_by_guard_id(Schedules, Grouped),
-  nl, write("Grouped: "), writeln(Grouped),
-  maplist(schedule_guard, Schedules, Guards).
+  maplist(schedule_group_guard, Grouped, Guards).
 
 group_by_guard_id(Schedules, Grouped) :- group_by_guard_id(Schedules, Grouped, grouped{}).
-group_by_guard_id([], Grouped, Acc) :- !, Grouped = Acc.
+group_by_guard_id([], Grouped, Acc) :- !, dict_values(Acc, Grouped).
 group_by_guard_id(Schedules, Grouped, Acc) :-
   [ Schedule | Rest ] = Schedules,
-  Group = Acc.get(Schedule.id, guard{id: Schedule.GuardId, naps: []}),
+  Key = Schedule.guard_id,
+  Group = Acc.get(Key, guard{id: Schedule.guard_id, naps: []}), !,
   append(Group.naps, Schedule.naps, NewNaps),
   NewGroup = Group.put(naps, NewNaps),
-  NewAcc = Acc.put(Schedule.id, NewGroup),
+  NewAcc = Acc.put(Key, NewGroup),
   group_by_guard_id(Rest, Grouped, NewAcc).
 
-schedule_guard(Schedule, Guard) :-
-  Guard = guard{id: Schedule.guard_id, naps: Schedule.naps}.
+schedule_group_guard(Group, Guard) :- Guard = guard{id: Group.id, naps: Group.naps}.
+
+dict_values(Dict, Values) :-
+  dict_pairs(Dict,_,Pairs),
+  pairs_values(Pairs,Values).
 
 :- begin_tests(schedules_guards).
 
