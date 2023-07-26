@@ -3,6 +3,7 @@
 :- use_module(input_schedules).
 :- use_module(schedules_guards).
 :- use_module(part_1).
+:- use_module(part_2).
 
 :- initialization(main, main).
 
@@ -16,6 +17,8 @@ main(Argv) :-
   schedules_guards(Schedules, Guards),
   part_1(Guards, Part1Answer),
   log("Part 1 Answer", Part1Answer),
+  part_2(Guards, Part2Answer),
+  log("Part 2 Answer", Part2Answer),
   close(In).
 
 

@@ -4,7 +4,7 @@ test_command() {
   local consult_stmt
   consult_stmt=""
 
-  for file in $(ls *.pl); do
+  for file in $(ls *.test.pl); do
     consult_stmt="$consult_stmt consult('$file'),"
   done
 
@@ -12,12 +12,17 @@ test_command() {
 }
 
 main(){
-  local flag;
+  local flag status;
   flag="$1"
 
   if [[ $flag == "-w" ]] || [[ $flag == "--watch" ]]; then
-    echo "watching..."
-    ls | entr -c swipl -g "$(test_command)"
+    while sleep 0.1; do
+      ls *.pl | entr -d -c ./test.sh
+      status=$?
+      if [[ $status -ne 2 ]]; then
+        exit $status
+      fi
+    done
   else
     swipl -g "$(test_command)"
   fi
