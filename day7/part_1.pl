@@ -3,7 +3,6 @@
 :- use_module(instructions_steps).
 :- use_module(step_order).
 
-part_1(Instructions, Result) :-
-  instructions_steps(Instructions, Steps),
+part_1(Steps, Result) :-
   step_order(Steps, Path),
   atomics_to_string(Path, Result).

@@ -1,6 +1,6 @@
 #!/usr/bin/env swipl
 
-:- use_module(stream_instructions).
+:- use_module(stream_steps).
 :- use_module(part_1).
 % :- use_module(part_2).
 
@@ -10,12 +10,12 @@ main() :- main(["input.txt"]).
 main(Argv) :-
   [Filename | _] = Argv,
   open(Filename, read, In),
-  stream_instructions(In, Instructions),
+  stream_steps(In, Steps),
 
-  part_1(Instructions, Part1Answer),
+  part_1(Steps, Part1Answer),
   log("Part 1 Answer", Part1Answer).
 
-  % part_2(10000, Coordinates, Part2Answer),
+  % part_2(60, Steps, Part2Answer),
   % log("Part 2 Answer", Part2Answer).
 
 
