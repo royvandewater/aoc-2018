@@ -2,24 +2,29 @@
 
 :- begin_tests(part_2).
 
-test(when_given_empty_list, fail) :-
-  part_2(1, [], _).
+test(when_empty, true(X == 0)) :-
+  part_2(1, 0, [], X).
 
-test(when_given_distance_one_and_one_coordinate, true(X == 1)) :-
-  part_2(1, [coordinate(1, 1)], X).
+test(when_duration_one_and_one_step, true(X == 2)) :-
+  part_2(1, 1, [step('A', [])], X).
 
-test(when_a_box, true(X == 9)) :-
-  part_2(9, [ coordinate(0, 0),
-              coordinate(2, 0),
-              coordinate(0, 2),
-              coordinate(2, 2) ], X).
+test(when_duration_two_and_one_step, true(X == 3)) :-
+  part_2(1, 2, [step('A', [])], X).
 
-test(when_example_1, true(X == 16)) :-
-  part_2(32, [ coordinate(1, 1),
-               coordinate(1, 6),
-               coordinate(8, 3),
-               coordinate(3, 4),
-               coordinate(5, 5),
-               coordinate(8, 9) ], X).
+test(when_duration_two_and_two_linear_steps, true(X == 7)) :-
+  part_2(1, 2, [step('A', []),
+                step('B', ['A'])], X).
+
+test(when_2_workers_with_parallel_steps, true(X == 4)) :-
+  part_2(2, 2, [step('A', []),
+                step('B', [])], X).
+
+test(when_example_1, true(X == 15), fixme) :-
+  part_2(2, 0, [step('C', []),
+                step('A', ['C']),
+                step('F', ['C']),
+                step('B', ['A']),
+                step('D', ['A']),
+                step('E', ['B', 'D', 'F'])], X).
 
 :- end_tests(part_2).

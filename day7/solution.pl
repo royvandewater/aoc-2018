@@ -2,7 +2,7 @@
 
 :- use_module(stream_steps).
 :- use_module(part_1).
-% :- use_module(part_2).
+:- use_module(part_2).
 
 :- initialization(main, main).
 
@@ -13,10 +13,10 @@ main(Argv) :-
   stream_steps(In, Steps),
 
   part_1(Steps, Part1Answer),
-  log("Part 1 Answer", Part1Answer).
+  log("Part 1 Answer", Part1Answer),
 
-  % part_2(60, Steps, Part2Answer),
-  % log("Part 2 Answer", Part2Answer).
+  part_2(5, 60, Steps, Part2Answer),
+  log("Part 2 Answer", Part2Answer).
 
 
 log(Label, Value) :- write(Label), write(": "), writeln(Value).
