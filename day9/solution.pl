@@ -1,21 +1,18 @@
 #!/usr/bin/env swipl
 
 :- use_module(debug).
-:- use_module(stream_tree).
 :- use_module(part_1).
 :- use_module(part_2).
 
 :- initialization(main, main).
 
-main() :- main(["input.txt"]).
-main(Argv) :-
-  [Filename | _] = Argv,
-  open(Filename, read, In),
-  stream_tree(In, Tree),
+main() :-
+  PlayerCount = 470,
+  Iterations = 72170,
 
-  part_1(Tree, Part1Answer),
+  part_1(PlayerCount, Iterations, Part1Answer),
   debug("Part 1 Answer: ~w", [Part1Answer]),
 
-  part_2(Tree, Part2Answer),
+  part_2(_, Part2Answer),
   debug("Part 2 Answer: ~w", [Part2Answer]).
 
