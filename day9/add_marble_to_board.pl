@@ -4,13 +4,14 @@
 :- use_module(split_at).
 
 add_marble_to_board(Turn, CurrentMarble, Board, BoardWithMarble) :-
+  BoardWithMarble = Board.insert_at(2, CurrentMarble)
+
   index_of(Board, CurrentMarble, CurrentMarbleIndex),
 
   length(Board, BoardLength),
   Index is (CurrentMarbleIndex + 2) mod BoardLength,
 
-  insert_marble_at(Index, Turn, Board, Board1),
-  shift_board_so_min_marble_is_start(Board1, BoardWithMarble).
+  insert_marble_at(Index, Turn, Board, BoardWithMarble).
 
 insert_marble_at(Index, Marble, Board, Result) :-
   split_at(Index, Board, FirstN, Rest),
