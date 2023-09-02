@@ -10,5 +10,5 @@ min_node(Nodes, Curr, Min, Acc) :-
   atom_number(Curr, C),
   AccNext is min(Acc, C),
   del_dict(Curr, Nodes, _, NodesNext),
-  min_node(NodesNext, Nodes.get(Curr), Min, AccNext).
+  min_node(NodesNext, Nodes.get(Curr).next, Min, AccNext).
 

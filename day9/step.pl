@@ -1,9 +1,6 @@
 :- module(step, [step/2]).
 
 :- use_module(board).
-:- use_module(debug).
-:- use_module(remove_marble_from_board).
-:- use_module(split_at).
 
 step(State, NextState) :-
   is_divisible_by_23(State.turn), !,

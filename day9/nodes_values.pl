@@ -10,4 +10,4 @@ nodes_values(nodes{}, _, Values, Acc) :-
 
 nodes_values(Nodes, Curr, Values, Acc) :-
   del_dict(Curr, Nodes, _, NodesNext),
-  nodes_values(NodesNext, Nodes.get(Curr), Values, [Curr | Acc]).
+  nodes_values(NodesNext, Nodes.get(Curr).next, Values, [Curr | Acc]).
