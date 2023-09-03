@@ -14,7 +14,7 @@ part_1(NumPlayers, Iterations, HighScore) :-
                                          board: Board}).
 
 % play_game(_MaxTurn, _HighScore, State) :-
-%   0 is State.turn mod 1000,
+%   0 is State.turn mod 100000,
 %   debug("Turn: ~w", State.turn),
 %   false.
 

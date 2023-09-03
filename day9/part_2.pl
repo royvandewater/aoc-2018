@@ -1,3 +1,7 @@
-:- module(part_2, [part_2/2]).
+:- module(part_2, [part_2/3]).
 
-part_2(_, "Not Implemented").
+:- use_module(part_1).
+
+part_2(PlayerCount, Iterations, Part2Answer) :-
+  Iterations2 is Iterations * 100,
+  part_1(PlayerCount, Iterations2, Part2Answer).
