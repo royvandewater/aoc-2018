@@ -4,12 +4,12 @@ insert_node_at(Nodes, Prev, 1, Value, NodesOut) :-
   !,
   PrevNode = Nodes.get(Prev),
   Next = PrevNode.next,
+  NextNode = Nodes.get(Next),
 
-  Nodes0 = Nodes.put(Prev, PrevNode.put(next, Value))
-                .put(Value, node{prev: Prev, next: Next}),
-
-  NextNode = Nodes0.get(Next), % broken out for the case where Next = Prev
-  NodesOut = Nodes0.put(Next, NextNode.put(prev, Value)).
+  b_set_dict(next, PrevNode, Value),
+  b_set_dict(prev, NextNode, Value),
+  b_set_dict(Value, Nodes, node{prev: Prev, next: Next}),
+  NodesOut = Nodes.
 
 insert_node_at(Nodes, Current, Offset, Value, NodesOut) :-
   Offset < 1, !,

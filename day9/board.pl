@@ -1,4 +1,4 @@
-:- module(board, [new_board/3]).
+:- module(board, [new_board/4]).
 
 :- use_module(delete_node_at).
 :- use_module(insert_node_at).
@@ -6,8 +6,8 @@
 :- use_module(nodes_values).
 :- use_module(values_nodes).
 
-new_board(Values, Current, Board) :-
-  values_nodes(Values, Nodes),
+new_board(Values, MaxSize, Current, Board) :-
+  values_nodes(Values, MaxSize, Nodes),
   atom_number(C, Current),
   Board = board{nodes: Nodes, current: C}.
 

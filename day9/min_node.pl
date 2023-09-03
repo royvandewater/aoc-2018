@@ -1,14 +1,9 @@
 :- module(min_node, [min_node/3]).
 
+:- use_module(nodes_values).
+
 min_node(Nodes, Entry, Min) :-
-  atom_number(Entry, E),
-  min_node(Nodes, Entry, Min, E).
-
-min_node(nodes{}, _Curr, Min, Acc) :- !, atom_number(Min, Acc).
-
-min_node(Nodes, Curr, Min, Acc) :-
-  atom_number(Curr, C),
-  AccNext is min(Acc, C),
-  del_dict(Curr, Nodes, _, NodesNext),
-  min_node(NodesNext, Nodes.get(Curr).next, Min, AccNext).
+  nodes_values(Nodes, Entry, Values),
+  min_list(Values, MinValue),
+  atom_number(Min, MinValue).
 

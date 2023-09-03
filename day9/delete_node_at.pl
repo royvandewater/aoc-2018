@@ -1,17 +1,18 @@
 :- module(delete_node_at, [delete_node_at/6]).
 
+% Descructively modifies Nodes
 delete_node_at(Nodes, Current, 0, ValueOut, NodesOut, CurrentOut) :-
   !,
   Node = Nodes.get(Current),
-  del_dict(Current, Nodes, _, Nodes1),
+  b_set_dict(Current, Nodes, none),
 
   ValueOut = Current,
   CurrentOut = Node.next,
 
-  Prev     = Nodes1.get(Node.prev),
-  Nodes2   = Nodes1.put(Node.prev, Prev.put(next, Node.next)),
-  Next     = Nodes2.get(Node.next),
-  NodesOut = Nodes2.put(Node.next, Next.put(prev, Node.prev)).
+  b_set_dict(next, Nodes.get(Node.prev), Node.next),
+  b_set_dict(prev, Nodes.get(Node.next), Node.prev),
+
+  NodesOut = Nodes.
 
 delete_node_at(Nodes, Current, Offset, ValueOut, NodesOut, CurrentOut) :-
   Offset < 0, !,
