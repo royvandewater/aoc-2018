@@ -14,7 +14,6 @@ input_points([ Line | Rest ], Points, Acc) :-
   input_points(Rest, Points, [ Point | Acc ]).
 
 line_point(Line, Point) :-
-  nl,
   split_string(Line, ",>", " abcdefghijklmnopqrstuvwxyz=<", [PosXStr, PosYStr, VelXStr, VelYStr, _]),
   maplist(atom_number, [PosXStr, PosYStr, VelXStr, VelYStr], [PosX, PosY, VelX, VelY]),
   Point = point{

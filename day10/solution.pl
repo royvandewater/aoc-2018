@@ -24,6 +24,15 @@ main(Argv) :-
 iteration(N, Points) :-
   part_1(Points, N, OutStr),
   debug("Iteration: ~w\n\n~w\n", [ N, OutStr ]),
+  maybe_wait(N, Points, OutStr).
+
+maybe_wait(N, Points, OutStr) :-
+  re_match("skipping$", OutStr),
+  !,
+  N1 is N + 1,
+  iteration(N1, Points).
+
+maybe_wait(N, Points, OutStr) :-
   get_code(Code),
   Code \= -1,
   N1 is N + 1,

@@ -1,41 +1,45 @@
 :- module(positions_string, [positions_string/2]).
 
+:- use_module(bounds_coords).
+:- use_module(debug).
+
 positions_string([], "") :- !.
 
 positions_string(Positions, OutStr) :-
+  positions_bounds(Positions, [Xmin, Xmax, _, _]),
+  NumCols is Xmax - Xmin,
+  NumCols > 100,
+  !,
+  format_string("More than 100 columns (~w), skipping", [NumCols], OutStr).
+
+positions_string(Positions, OutStr) :-
+  positions_bounds(Positions, [_, _, Ymin, Ymax]),
+  NumRows is Ymax - Ymin,
+  NumRows > 100,
+  !,
+  format_string("More than 100 rows (~w), skipping", [NumRows], OutStr).
+
+positions_string(Positions, OutStr) :-
+  positions_bounds(Positions, Bounds),
+  positions_dict(Positions, Dict),
+  bounds_coords(Bounds, Coords),
+  maplist(format_row(Dict), Coords, Rows),
+  atomics_to_string(Rows, '\n', OutStr).
+
+format_row(Dict, Row, Out) :-
+  maplist(format_point(Dict), Row, Chars),
+  string_chars(Out, Chars).
+
+positions_bounds(Positions, [Xmin, Xmax, Ymin, Ymax]) :-
   maplist(position_x, Positions, Xs),
   min_list(Xs, Xmin),
   max_list(Xs, Xmax),
   maplist(position_y, Positions, Ys),
   min_list(Ys, Ymin),
-  max_list(Ys, Ymax),
-  positions_dict(Positions, Dict),
-  bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords),
-  maplist(format_point(Dict), Coords, Pixels),
-  string_chars(OutStr, Pixels).
+  max_list(Ys, Ymax).
 
 position_x(vector(X, _), X).
 position_y(vector(_, Y), Y).
-
-bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords) :- bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords, Xmin, Ymax, [[]]).
-bounds_coords(_   , Xmax, Ymin, _   , Coords, X, Y, Acc) :-
-  X > Xmax,
-  Y < Ymin,
-  !,
-  reverse(Acc, ReverseAcc),
-  maplist(reverse, ReverseAcc, Coords).
-
-bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords, X, Y, Acc) :-
-  X > Xmax,
-  !,
-  Ynext is Y - 1,
-  bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords, Xmin, Ynext, [ [] | Acc ]).
-
-bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords, X, Y, Acc) :-
-  [ Line | Rest ] = Acc,
-  X1 is X + 1,
-  LineNew = [ vector(X, Y) | Line ],
-  bounds_coords(Xmin, Xmax, Ymin, Ymax, Coords, X1, Y, [ LineNew | Rest ]).
 
 format_point(Dict, Coord, Pixel) :-
   position_key(Coord, Key),
