@@ -5,4 +5,4 @@
 
 part_1(Serial, Answer) :-
   serial_grid(Serial, PowerGrid),
-  grid_max_square(PowerGrid, square(_, Answer)).
+  grid_max_square(PowerGrid, 3, square(_, Answer, _)).
