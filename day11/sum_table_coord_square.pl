@@ -1,9 +1,11 @@
 :- module(sum_table_coord_square, [sum_table_coord_square/4]).
 
 sum_table_coord_square(SumTable, Size, Coord, Square) :-
-  c(X0, Y0) = Coord,
-  X1 is X0 + Size - 1,
-  Y1 is Y0 + Size - 1,
+  c(X, Y) = Coord,
+  X0 is X - 1,
+  Y0 is Y - 1,
+  X1 is X + Size - 1,
+  Y1 is Y + Size - 1,
   sum_table_coord_value(SumTable, c(X0, Y0), A),
   sum_table_coord_value(SumTable, c(X1, Y0), B),
   sum_table_coord_value(SumTable, c(X0, Y1), C),

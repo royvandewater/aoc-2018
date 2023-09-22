@@ -8,7 +8,8 @@
 part_2(Serial, Answer) :-
   serial_grid(Serial, PowerGrid),
   grid_sum_table(PowerGrid, SumTable),
-  findall(Square, (between(1, 20, N), debug(N), sum_table_max_square(SumTable, N, Square)), Squares),
+  findall(Square, (between(1, 300, N), sum_table_max_square(SumTable, N, Square)), Squares),
+  print_squares(Squares),
   max_square(Squares, MaxSquare),
   square(_, c(X, Y), Size) = MaxSquare,
   Answer = answer(X, Y, Size).
@@ -26,3 +27,5 @@ max_square([ Square | Rest ], MaxSquare, Acc) :-
    -> max_square(Rest, MaxSquare, Square)
    ;  max_square(Rest, MaxSquare, Acc)).
 
+print_squares([]).
+print_squares([ S | Rest ]) :- debug(S), print_squares(Rest).

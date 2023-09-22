@@ -7,7 +7,7 @@ sum_table_max_square(SumTable, Size, MaxSquare) :-
   sum_table_max_square(SumTable, Size, MaxSquare, c(1, 1), Square).
 
 sum_table_max_square(_SumTable, Size, MaxSquare, c(1, Y), Acc) :-
-  Y + Size > 300,
+  Y + Size - 1 > 300,
   !,
   MaxSquare = Acc.
 
