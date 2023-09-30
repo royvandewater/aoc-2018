@@ -35,4 +35,17 @@ v
   assertion(X.carts == [ cart(c(0, 0), south),
                          cart(c(0, 1), north) ]).
 
+
+test(one_corner_wn_es) :- % west-north & east-south
+  input_state("/", X),
+  assertion(X.turns.turn(c(0,0)) == corner_wn_es).
+
+test(one_corner_ws_en) :- % west-south & east-north
+  input_state("\\", X),
+  assertion(X.turns.turn(c(0,0)) == corner_ws_en).
+
+test(one_intersection) :-
+  input_state("+", X),
+  assertion(X.turns.turn(c(0,0)) == intersection).
+
 :- end_tests(input_state).
