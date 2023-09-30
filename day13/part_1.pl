@@ -2,31 +2,34 @@
 
 :- use_module(cart).
 :- use_module(debug).
+:- use_module(sort_carts).
 
-% part_1(State, _) :-
-%   debug("Turns: ~w, Carts: ~w", [State.turns, State.carts]),
-%   false.
+% part_1(_, _) :- format(".", []), false.
 
 part_1(State, FirstCollision) :-
-  [ Cart | Rest ] = State.carts,
-  Cart1 = Cart.advance(State.turns),
-  no_collisions(Cart1, Rest),
+  turn(State.turns, State.carts, Carts, Collision),
+  var(Collision),
   !,
-  append(Rest, [ Cart1 ], Carts),
-  State1 = State.put(carts, Carts),
-  part_1(State1, FirstCollision).
+  part_1(State.put(carts, Carts), FirstCollision).
 
 part_1(State, FirstCollision) :-
-  [ Cart | _ ] = State.carts,
-  Cart1 = Cart.advance(State.turns),
-  Coord = Cart1.coord,
-  FirstCollision = Coord.
+  turn(State.turns, State.carts, _, Collision),
+  FirstCollision = Collision.
 
-no_collisions(Needle, Haystack) :- \+ collisions(Needle, Haystack).
+turn(Turns, CartsIn, CartsOut, Collision) :- turn(Turns, CartsIn, CartsOut, Collision, []).
 
-collisions(_, []) :- !, false.
-collisions(Needle, [ Item | Rest ]) :-
+turn(_, [], CartsOut, _, Acc) :- !, sort_carts(Acc, CartsOut).
+
+turn(Turns, [ Cart | Rest ], CartsOut, Collision, Acc) :-
+  Cart1 = Cart.advance(Turns),
+  append(Rest, Acc, Others),
+  (collision(Cart1, Others)
+   -> Collision = Cart1.coord
+   ;  turn(Turns, Rest, CartsOut, Collision, [ Cart1 | Acc])).
+
+collision(_, []) :- !, false.
+collision(Needle, [ Item | Rest ]) :-
   C1 = Needle.coord,
   C2 = Item.coord,
 
-  C1 == C2 ; collisions(Needle, Rest).
+  C1 == C2 ; collision(Needle, Rest).

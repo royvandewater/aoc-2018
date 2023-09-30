@@ -57,5 +57,18 @@ test(crash_in_two_moves_around_a_ws_corner) :-
   part_1(State, X),
   assertion(X == c(2,1)).
 
+test(example_1) :-
+  Input ="\
+/->-O
+|   |  /----O
+| /-+--+-O  |
+| | |  | v  |
+O-+-/  O-+--/
+  O------/
+",
+  input_state(Input, State),
+  part_1(State, X),
+  assertion(X == c(7,3)).
+
 
 :- end_tests(part_1).

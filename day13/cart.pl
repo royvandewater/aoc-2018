@@ -1,5 +1,15 @@
 :- module(cart, []).
 
+Cart.advance(_) := _ :-
+  c(X, _) = Cart.coord,
+  X < 0,
+  domain_error(x_not_less_than_0, X).
+
+Cart.advance(_) := _ :-
+  c(_, Y) = Cart.coord,
+  Y < 0,
+  domain_error(x_not_less_than_0, Y).
+
 Cart.advance(Turns) := OutCart :-
   Coord = Cart.coord,
   Turn = Turns.get_turn(Coord),
