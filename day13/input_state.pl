@@ -20,11 +20,6 @@ line_state(Line, State, StateNext, Y) :-
 
 chars_state([], State, StateNext, _, _) :- StateNext = State, !.
 
-chars_state([ '-' | Rest ], State, StateNext, Y, X) :-
-  !,
-  X1 is X + 1,
-  chars_state(Rest, State, StateNext, Y, X1).
-
 chars_state([ '>' | Rest ], State, StateNext, Y, X) :-
   !,
   direction_chars_state(east, Rest, State, StateNext, Y, X).
@@ -40,6 +35,12 @@ chars_state([ 'v' | Rest ], State, StateNext, Y, X) :-
 chars_state([ '^' | Rest ], State, StateNext, Y, X) :-
   !,
   direction_chars_state(north, Rest, State, StateNext, Y, X).
+
+chars_state([ _ | Rest ], State, StateNext, Y, X) :-
+  !,
+  X1 is X + 1,
+  chars_state(Rest, State, StateNext, Y, X1).
+
 
 direction_chars_state(Direction, Rest, State, StateNext, Y, X) :-
   X1 is X + 1,
