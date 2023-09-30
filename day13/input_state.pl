@@ -1,5 +1,6 @@
 :- module(input_state, [input_state/2]).
 
+:- use_module(cart).
 :- use_module(turns).
 
 input_state(Input, State) :-
@@ -29,6 +30,7 @@ chars_state([ '^' | Rest ], State, StateNext, Y, X) :- !, direction_chars_state(
 
 chars_state([ '/'  | Rest ], State, StateNext, Y, X) :- !, turn_chars_state(corner_wn_es, Rest, State, StateNext, Y, X).
 chars_state([ '\\' | Rest ], State, StateNext, Y, X) :- !, turn_chars_state(corner_ws_en, Rest, State, StateNext, Y, X).
+chars_state([ 'O'  | Rest ], State, StateNext, Y, X) :- !, turn_chars_state(corner_ws_en, Rest, State, StateNext, Y, X).
 chars_state([ '+'  | Rest ], State, StateNext, Y, X) :- !, turn_chars_state(intersection, Rest, State, StateNext, Y, X).
 
 chars_state([ _ | Rest ], State, StateNext, Y, X) :-
@@ -45,6 +47,6 @@ turn_chars_state(Turn, Rest, State, StateNext, Y, X) :-
 
 direction_chars_state(Direction, Rest, State, StateNext, Y, X) :-
   X1 is X + 1,
-  Carts1 = [ cart(c(X, Y), Direction) | State.carts ],
+  Carts1 = [ cart{coord: c(X, Y), facing: Direction, last_decision: right} | State.carts ],
   State1 = State.put(carts, Carts1),
   chars_state(Rest, State1, StateNext, Y, X1).

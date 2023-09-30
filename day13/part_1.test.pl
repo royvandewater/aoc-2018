@@ -35,4 +35,27 @@ test(crash_in_four_moves) :-
   part_1(State, X),
   assertion(X == c(2,0)).
 
+test(crash_in_two_moves_around_a_corner) :-
+  Input = "\
+/-<
+|
+|
+^
+",
+  input_state(Input, State),
+  part_1(State, X),
+  assertion(X == c(0,1)).
+
+test(crash_in_two_moves_around_a_ws_corner) :-
+  Input = "\
+>-O
+  |
+  |
+  ^
+",
+  input_state(Input, State),
+  part_1(State, X),
+  assertion(X == c(2,1)).
+
+
 :- end_tests(part_1).
