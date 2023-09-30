@@ -7,9 +7,12 @@
 
 :- initialization(main, main).
 
+parse_args([ Filename | _ ], Filename).
+parse_args([], "input.txt").
+
 main() :- main(["input.txt"]).
 main(Argv) :-
-  [Filename | _] = Argv,
+  parse_args(Argv, Filename),
   open(Filename, read, In),
   stream_tree(In, Tree),
 
