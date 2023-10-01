@@ -1,6 +1,7 @@
 :- module(part_1, [part_1/2]).
 
 :- use_module(cart).
+:- use_module(collision).
 :- use_module(debug).
 :- use_module(sort_carts).
 
@@ -26,10 +27,3 @@ turn(Turns, [ Cart | Rest ], CartsOut, Collision, Acc) :-
   (collision(Cart1, Others)
    -> Collision = Cart1.coord
    ;  turn(Turns, Rest, CartsOut, Collision, [ Cart1 | Acc])).
-
-collision(_, []) :- !, false.
-collision(Needle, [ Item | Rest ]) :-
-  C1 = Needle.coord,
-  C2 = Item.coord,
-
-  C1 == C2 ; collision(Needle, Rest).
