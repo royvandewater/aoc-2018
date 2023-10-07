@@ -9,8 +9,8 @@
 main(_) :-
   Input = 236021,
 
-  part_1(Input, Part1Answer),
-  debug("Part 1 Answer: ~w", [Part1Answer]),
+  % part_1(Input, Part1Answer),
+  % debug("Part 1 Answer: ~w", [Part1Answer]),
 
   atom_string(Input, InputStr),
   part_2(InputStr, Part2Answer),

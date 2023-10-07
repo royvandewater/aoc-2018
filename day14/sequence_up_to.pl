@@ -2,6 +2,7 @@
 
 :- use_module(debug).
 :- use_module(move_elf).
+:- use_module(next_state).
 
 sequence_up_to(0, []) :- !.
 sequence_up_to(1, [3]) :- !.
@@ -23,26 +24,3 @@ sequence_up_to(N, Seq, State) :-
   next_state(State, NextState, NumAdded),
   N1 is N - NumAdded,
   sequence_up_to(N1, Seq, NextState).
-
-next_state(State, NextState, NumAdded) :-
-  find_next_recipe_values(State, Values),
-  append(Values, State.sequence, Seq1),
-
-  move_elf(Seq1, State.elf1, Elf1),
-  move_elf(Seq1, State.elf2, Elf2),
-
-  NextState = State.put(sequence, Seq1)
-                   .put(elf1, Elf1)
-                   .put(elf2, Elf2),
-
-  length(Values, NumAdded).
-
-find_next_recipe_values(State, RecipeValues) :-
-  Value is State.elf1.value + State.elf2.value,
-  atom_string(Value, ValueStr),
-  string_chars(ValueStr, Chars),
-  reverse(Chars, RevChars),
-  maplist(atom_number, RevChars, RecipeValues).
-
-lpad(Number, Padded) :-
-  format(atom(Padded), "~`0t~d~2+", Number).
