@@ -3,9 +3,10 @@
 :- use_module(debug).
 :- use_module(move_elf).
 :- use_module(mutdict).
+:- use_module(print_state).
 
 next_state(State, NextState, NumAdded) :-
-  debug("State: ~w", [State]),
+  print_state(State),
   find_next_recipe_values(State, Values),
   debug("NextValues: ~w", [Values]),
   append(Values, State.sequence, Seq1),
