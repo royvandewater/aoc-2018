@@ -2,6 +2,7 @@
 
 :- use_module(debug).
 :- use_module(matches_beginning).
+:- use_module(mutdict).
 :- use_module(next_state).
 
 part_2(Input, Answer) :-
@@ -11,7 +12,9 @@ part_2(Input, Answer) :-
 
   State = state{sequence: [7, 3], % sequence is reversed
                 elf1: elf{position: 0, value: 3},
-                elf2: elf{position: 1, value: 7}},
+                elf2: elf{position: 1, value: 7},
+                mutdict: mutdict{}.insert_all(0, [3, 7]),
+                count: 2},
 
   advance_until_match(Match, State, Answer).
 

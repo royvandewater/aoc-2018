@@ -2,6 +2,7 @@
 
 :- use_module(debug).
 :- use_module(move_elf).
+:- use_module(mutdict).
 :- use_module(next_state).
 
 sequence_up_to(0, []) :- !.
@@ -9,7 +10,9 @@ sequence_up_to(1, [3]) :- !.
 sequence_up_to(2, [3, 7]) :- !.
 sequence_up_to(N, Seq) :- sequence_up_to(N, Seq, state{sequence: [7, 3], % sequence is reversed
                                                        elf1: elf{position: 0, value: 3},
-                                                       elf2: elf{position: 1, value: 7}}).
+                                                       elf2: elf{position: 1, value: 7},
+                                                       mutdict: mutdict{}.insert_all(0, [3, 7]),
+                                                       count: 2}).
 
 sequence_up_to(N, _, _) :- 0 is N mod 1000, debug(N), false.
 

@@ -1,8 +1,8 @@
-:- module(move_elf, [move_elf/3]).
+:- module(move_elf, [move_elf/4]).
 
-move_elf(Seq, InElf, OutElf) :-
-  length(Seq, Length),
-  Position is (1 + InElf.position + InElf.value) mod Length,
-  Index is Length - Position,
-  nth1(Index, Seq, Value),
+:- use_module(mutdict).
+
+move_elf(MutDict, Count, InElf, OutElf) :-
+  Position is (1 + InElf.position + InElf.value) mod Count,
+  Value = MutDict.retrieve(Position),
   OutElf = elf{ position: Position, value: Value }.
