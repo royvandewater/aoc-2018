@@ -14,14 +14,12 @@ sequence_up_to(N, Seq) :- sequence_up_to(N, Seq, state{sequence: [7, 3], % seque
                                                        mutdict: mutdict{}.insert_all(0, [3, 7]),
                                                        count: 2}).
 
-sequence_up_to(N, _, _) :- 0 is N mod 1000, debug(N), false.
-
-sequence_up_to(2, Seq, State) :- !, reverse(State.sequence, Seq).
+sequence_up_to(2, Seq, State) :- !, reverse(State.mutdict.sequence(), Seq).
 sequence_up_to(N, _, _) :- N < 1, !, domain_error(n_should_not_be_less_than_1, N).
 sequence_up_to(1, Seq, State) :-
   !,
-  [ _ | Sequence ] = State.sequence,
-  sequence_up_to(2, Seq, State.put(sequence, Sequence)).
+  [ _ | Sequence ] = State.mutdict.sequence(),
+  reverse(Sequence, Seq).
 
 sequence_up_to(N, Seq, State) :-
   next_state(State, NextState, NumAdded),
