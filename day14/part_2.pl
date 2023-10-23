@@ -20,9 +20,20 @@ part_2(Input, Answer) :-
 
 advance_until_match(Chars, State, Answer) :-
   length(Chars, MatchLength),
-  TailIndex is State.count - MatchLength,
+  TailIndex is State.count - MatchLength + 1,
   Tail = State.mutdict.sequence(TailIndex),
   Chars == Tail,
+  !,
+  length(State.mutdict.sequence(), SeqLength),
+  Answer is SeqLength - MatchLength.
+
+advance_until_match(Chars, State, Answer) :-
+  length(Chars, MatchLength),
+  TailIndex is State.count - (MatchLength + 1),
+  Tail = State.mutdict.sequence(TailIndex),
+  drop_last(Tail, Tail1),
+  % debug("~w : ~w", [Tail, Tail1]),
+  Chars == Tail1,
   !,
   length(State.mutdict.sequence(), SeqLength),
   Answer is SeqLength - MatchLength.
@@ -32,5 +43,7 @@ advance_until_match(Chars, State, Answer) :-
   !,
   advance_until_match(Chars, NextState, Answer).
 
-
+drop_last(L1, L2) :- drop_last_step(L1, L2, []).
+drop_last_step([ _Item ], L2, Acc) :- reverse(L2, Acc), !.
+drop_last_step([ Item | Rest ], L2, Acc) :- drop_last_step(Rest, L2, [ Item | Acc ]).
 

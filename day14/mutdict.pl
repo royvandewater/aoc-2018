@@ -48,7 +48,7 @@ M.upsert_reverse_sequence(ReverseSequence) := MutDict :-
   MutDict = M.insert_all(0, Sequence).
 
 gen_pairs(Key, Pairs) :-
-  Max is Key + 1000000,
+  Max is Key + 30000000,
   debug("Increasing capacity from ~w to ~w", [Key, Max]),
   findall(K, between(Key, Max, K), Keys),
   maplist(to_none, Keys, Values),

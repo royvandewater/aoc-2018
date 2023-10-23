@@ -18,4 +18,8 @@ test(example_3) :-
   part_2("59414", X),
   assertion(X == 2018).
 
+test(real_puzzle) :-
+  part_2("236021", X),
+  assertion(X == 20221334).
+
 :- end_tests(part_2).

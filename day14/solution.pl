@@ -1,5 +1,6 @@
 #!/usr/bin/env swipl
 
+% answer part 2: 20,221,334
 ?- set_prolog_flag(stack_limit, 8_589_934_592).
 
 :- use_module(debug).
